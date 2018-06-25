@@ -1,0 +1,11 @@
+Polymer chain definition
+
+0.8889         rhostar # monomer density (to set simulation box size)
+592984         random # seed (8 digits or less)
+
+30               number of chains
+100             monomers/chain
+1.0             distance between monomers (in reduced units)
+1.02            no distance less than this from site i-1 to i+1 (reduced unit)
+0               salt types
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
