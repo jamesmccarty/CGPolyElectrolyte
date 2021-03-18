@@ -8,7 +8,7 @@ set sel [atomselect top "name 1 or name 2"]
 
 set Ntotal [$sel num ]
  
-set Nmon 100
+set Nmon 50
 
 puts $Ntotal
 

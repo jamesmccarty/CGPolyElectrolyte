@@ -1,8 +1,10 @@
-# FTS params
-B = 0.1     # excluded volume used in FTS
-E = 1.0    # Bjerrum length used in FTS
-abar = 1.0  # smearing length used in FTS
+# parameters
+vex = 0.006804     # excluded volume (v/b^3)
+lB = 0.33    # Bjerrum length (lB/b)
+atilde = 0.408248  # smearing length (a/b)
 Nref = 1.0  # reference N used in FTS
+rho =  0.8889     # density (only used to conver to FTS (rho*b^3))
+scale_Rg = False    # If True, all distances will be scaled by Rg = Sqrt(Nref)/Sqrt(6)
 # MD simulation params
 rcut = 6.5   # short-ranged distance cutoff
 dt = 0.005  # timestep

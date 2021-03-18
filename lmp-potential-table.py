@@ -24,7 +24,7 @@ def gaussforce(r,a,norm):
 
 def coul(r,lb,a,gewald,norm):
     ''' Smeared Coulomb potential '''
-    #print lb
+    #print(lb)
     vel=(lb/r)*(erf(r/(2.0*a))-erf(r*gewald))
     excl = gauss(r,a,norm)
     return vel + excl
@@ -36,7 +36,7 @@ def eforce(r,lb,a,gewald,norm):
 
 def coul12(r,lb,a,gewald,norm):
     ''' Smeared Coulomb potential '''
-    #print lb
+    #print(lb)
     vel=(lb/r)*(erf(r/(2.0*a))-erf(r*gewald))
     excl = gauss(r,a,norm)
     return -vel + excl
@@ -46,40 +46,65 @@ def eforce12(r,lb,a,gewald,norm):
     exclf=gaussforce(r,a,norm)
     return -force + exclf
 
-def get_params(B,E,abar,Nref):
+def get_params(vex,lB,atilde,Nref,rho):
     ''' convert between FTS and CG parameters '''
   #  B=0.1
   #  E=10.0
   #  abar=1.0
   #  Nref=1.0
 
-    ### convert to dimensional parameters
-    vex = B/math.sqrt(Nref)   # beta*u0*sqrt(216)/b^3
-    atilde = abar*math.sqrt(Nref) # a*sqrt(6)/b
-    lB = E/(4.0*math.pi)/Nref**(3.0/2.0) # reduced Bjerrum length # sigma^2 lB sqrt(6)/b
+    ### convert to FTS parameters:
+    Rg=math.sqrt(Nref/6.0)
+    B=vex*Nref*Nref/(Rg*Rg*Rg)   # B=vex*N^2/Rg^3
+    abar = atilde/Rg # a/Rg
+    E = (4.0*math.pi)*lB*Nref*Nref/Rg # reduced Bjerrum length E=4 pi lB N^2/Rg
+    C = rho*Rg*Rg*Rg/Nref
 
-    ####
-    norm = vex/(8.0*math.pi**(3.0/2.0)*atilde**3) # prefactor of excluded volume potential
-    return (vex,atilde,lB,norm)
+    print('FTS parameters')
+    print('excluded volume: B', B)
+    print('smearing length: abar', abar)
+    print('reduced Bjerrum length: E', E)
+    print('chain density: C', C)
+
+    if(scale_Rg):
+        norm = B/(8.0*math.pi**(3.0/2.0)*abar**3)
+    else:
+        norm = vex/(8.0*math.pi**(3.0/2.0)*atilde**3) # prefactor of excluded volume potential
+    return (norm)
 
 fout = open('in.soft','w')
 
-params = get_params(B,E,abar,Nref)
+norm = get_params(vex,lB,atilde,Nref,rho)
+
+bond_const = 1.5
+
+Rg=math.sqrt(Nref/6.0)
+if(scale_Rg):
+    print("scaling distances by Rg: ",Rg)
+    bond_const = 1.5*Rg*Rg
+    print("bond K: ",bond_const)
+    atilde = atilde/Rg
+    print("smearing length: ", atilde)
+    lB = lB/Rg
+    print("Bjerrum length: ", lB)
+    print("Set reduced density to ",rho*Rg*Rg*Rg/Nref)
+else:
+    print("scaling distances by b")
+    print("bond K: ",bond_const)
+    print("smearing length: ", atilde)
+    print("Bjerrum length: ",lB)
+    print("set reduced density to ",rho)
 
 if not salts:
     NCA=0
     NCC=0
 
 
-vex = params[0]
-atilde = params[1]
-lB = params[2]
-norm = params[3]
-print 'reduced Bjerrum length [b/sqr(6)]', lB
+print('reduced Bjerrum length [lB/b]', lB)
 
 dielectric = 1.0/lB   # effective dielectric constant for LAMMPS
-print 'dielectric', dielectric
-print 'Gaussian potential normalization constant',norm
+print('dielectric', dielectric)
+print('Gaussian potential normalization constant',norm)
 rfinal = rcut+0.5
 xdata1 = np.linspace(0.0,rfinal,Npoints+1)
 # drop zero point to avoid LAMMPS error
@@ -120,7 +145,8 @@ if(salts):
     fout.write('mass 4 1.0\n\n')
 
 fout.write('bond_style harmonic\n')
-fout.write('bond_coeff 1 0.25 0.0\n\n')     # harmonic bond
+
+fout.write('bond_coeff 1 '+str(bond_const)+' 0.0\n\n')     # harmonic bond
 fout.write('pair_style table bitmap '+str(M)+' '+kspace+'\n')
 #fout.write('pair_style table spline '+str(Npoints-2)+' ewald\n')
 fout.write('\n')

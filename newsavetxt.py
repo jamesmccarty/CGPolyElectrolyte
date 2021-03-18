@@ -8,7 +8,7 @@
 #
 # This modification was proposed at
 #    http://projects.scipy.org/numpy/ticket/1079
-# and may appear in future versions of the numpy library. 
+# and may appear in future versions of the numpy library.
 
 
 import numpy as np
@@ -52,9 +52,9 @@ def savetxthd(fname, X, fmt='%.18e',delimiter=' ',header=None):
         case delimiter is ignored.
     delimiter : str
         Character separating columns.
-    header : str 
-        A string which will be printed as a header before the data, 
-        it is not '\n'-terminated 
+    header : str
+        A string which will be printed as a header before the data,
+        it is not '\n'-terminated
 
 
     Examples
@@ -101,7 +101,7 @@ def savetxthd(fname, X, fmt='%.18e',delimiter=' ',header=None):
             import gzip
             fh = gzip.open(fname,'wb')
         else:
-            fh = file(fname,'w')
+            fh = open(fname,'w')
     elif hasattr(fname, 'seek'):
         fh = fname
     else:
@@ -140,7 +140,6 @@ def savetxthd(fname, X, fmt='%.18e',delimiter=' ',header=None):
 
     if header != None:
         fh.write(header)
-        
+
     for row in X:
         fh.write(format % tuple(row) + '\n')
-
